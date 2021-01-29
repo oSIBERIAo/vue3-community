@@ -13,6 +13,14 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
+    path: '/vue',
+    name: 'vue',
+    components: {
+      header: Header,
+      main: () => import('../views/Home.vue'),
+    },
+  },
+  {
     path: '/about',
     name: 'About',
     // route level code-splitting

@@ -21,6 +21,15 @@
   color: #2c3e50;
 }
 
+* {
+  outline: 1px dashed #f2000042;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
 #nav {
   padding: 30px;
 

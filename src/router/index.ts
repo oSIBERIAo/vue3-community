@@ -29,6 +29,22 @@ const routes: Array<RouteRecordRaw> = [
     component: () =>
       import(/* webpackChunkName: "about" */ '../views/About.vue'),
   },
+  {
+    path: '/signup',
+    name: 'Signup',
+    components: {
+      header: Header,
+      main: () => import('../views/Login/Signup.vue'),
+    },
+  },
+  {
+    path: '/signin',
+    name: 'Signin',
+    components: {
+      header: Header,
+      main: () => import('../views/Login/Signin.vue'),
+    },
+  },
 ]
 
 const router = createRouter({

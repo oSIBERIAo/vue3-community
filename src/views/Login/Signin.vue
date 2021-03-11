@@ -83,7 +83,7 @@ export default defineComponent({
       data.append('username', form.username)
       data.append('password', form.password)
       axios
-        .post(url.login, data)
+        .post(url.token, data)
         .then(response => {
           if (response.status === 201) {
             ElMessage.success({
@@ -91,6 +91,10 @@ export default defineComponent({
               type: 'success',
             })
           }
+          localStorage.setItem(
+            'token',
+            'Basic ' + btoa(response.data.token + ':'),
+          )
           setTimeout(() => {
             router.push('/')
           }, 3000)

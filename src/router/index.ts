@@ -45,6 +45,22 @@ const routes: Array<RouteRecordRaw> = [
       main: () => import('../views/Login/Signin.vue'),
     },
   },
+  {
+    path: '/user_profile',
+    name: 'profile',
+    components: {
+      header: Header,
+      main: () => import('../views/Topic/Profile.vue'),
+    },
+  },
+  {
+    path: '/topic',
+    name: 'topic',
+    components: {
+      header: Header,
+      main: () => import('../views/Topic/Topic.vue'),
+    },
+  },
 ]
 
 const router = createRouter({

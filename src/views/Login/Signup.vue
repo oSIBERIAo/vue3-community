@@ -40,7 +40,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { stringifyQuery, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
 import { url } from '../../../api'

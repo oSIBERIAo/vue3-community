@@ -6,6 +6,9 @@
         <a href="#"><router-link to="/about">About</router-link></a>
       </li>
       <li>
+        <a href="#"><router-link to="/topic">Topic</router-link></a>
+      </li>
+      <li>
         <a href="#"><router-link to="/vue">Home</router-link></a>
       </li>
       <li><a href="#">API</a></li>

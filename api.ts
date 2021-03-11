@@ -7,9 +7,10 @@ const url: Url = {
   host: '',
 
   // index
-  topic: '/api/topic',
+  topic: '/v1/topic',
+  topicxxx: '/v1/topic/xxx',
   topic_add: '/api/topic/add',
-  board: '/api/topic/board',
+  board: '/v1/board',
   topic_delete: '/api/topic/delete',
   uploads: '/uploads',
 
@@ -18,7 +19,10 @@ const url: Url = {
 
   // register
   register: '/v1/index/register',
-  login: '/v1/index/login',
+  token: '/v1/token',
+  profile: '/v1/index/profile',
+  addimg: '/v1/index/addimg',
+  xxx: '/v1/index/xxx',
 }
 
 const host = 'http://127.0.0.1:5000'

@@ -1,10 +1,11 @@
 <template>
-  <div class="Topic">
+  <div class="TopicContainer">
     <!--    <div class="loading" v-if="isLoading">-->
     <!--      &lt;!&ndash;      <img src="../assets/loading.gif" alt />&ndash;&gt;-->
     <!--    </div>-->
-    <div class="posts" v-else>
-      <ul>
+    <!--    <div class="topics" v-else>-->
+    <div class="topics">
+      <ul class="board">
         <li>
           <div class="toobar">
             <span @click="changeBoard(0)">
@@ -19,40 +20,42 @@
             </span>
           </div>
         </li>
-        <li v-for="post in data.posts">
-          <span>{{ post.content }}</span>
-          <a class="user_avatar">
-            <!--            <img :src="getImgUrl(post.user_id)" alt="" />-->
-          </a>
-          <a class="topic_title">
-            <!--            <router-link-->
-            <!--              :to="{-->
-            <!--                name: 'topic_detail',-->
-            <!--                params: {-->
-            <!--                  id: post.id,-->
-            <!--                },-->
-            <!--              }"-->
-            <!--              >{{ post.title }}</router-link-->
-            <!--            >-->
-          </a>
-          <!--          <span>{{ post.updated_time | formatDate }} / {{ post.views }}</span>-->
+      </ul>
+      <ul class="topicList">
+        <li class="topic" v-for="topic in data.topics" :key="topic.id">
+          <div>
+            <a class="user_avatar">
+              <img :src="getImgUrl(topic.user_id)" alt="" />
+            </a>
+            <a class="topic_title">
+              <router-link
+                :to="{
+                  name: 'topic_detail',
+                  params: {
+                    id: topic.id,
+                  },
+                  query: { id: topic.id },
+                }"
+                >{{ topic.title }}</router-link
+              >
+            </a>
+            <!--          <span>{{ topic.content }}</span>-->
+          </div>
+          <span class="views">
+            {{ formatDate(topic.updated_time) }} / {{ topic.views }}浏览
+          </span>
         </li>
       </ul>
-      <div id="sidebar">
-        <div class="panel">
-          <div class="inner">
-            <!--            <a href="/topic/detail/new" class="create_topic_btn">-->
-            <!--              <router-link-->
-            <!--                :to="{-->
-            <!--                  name: 'topic_new',-->
-            <!--                }"-->
-            <!--                >发布话题</router-link-->
-            <!--              >-->
-            <!--              &lt;!&ndash; <span class="span-success">发布话题</span> &ndash;&gt;-->
-            <!--            </a>-->
-          </div>
-        </div>
-      </div>
+    </div>
+    <div class="newTopic">
+      <a>
+        <router-link
+          :to="{
+            name: 'topic_new',
+          }"
+          >发布话题</router-link
+        >
+      </a>
     </div>
   </div>
 </template>
@@ -61,6 +64,7 @@
 import { url } from '../../../api'
 import axios from 'axios'
 import { defineComponent, onBeforeMount, reactive, ref } from 'vue'
+import { formatDate } from '@/libs/libs'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
@@ -73,7 +77,7 @@ export default defineComponent({
   setup() {
     const data = reactive({
       isLoading: false,
-      posts: [],
+      topics: [],
       postpage: 1,
       board: null,
     })
@@ -81,9 +85,8 @@ export default defineComponent({
       axios
         .get(url.topic)
         .then(res => {
-          console.log('data', data)
-          console.log('res', res)
-          data.posts = res.data
+          console.log('getTopicDate', res.data)
+          data.topics = res.data
         })
         .catch(err => {
           console.log(err)
@@ -93,8 +96,6 @@ export default defineComponent({
       axios
         .get(url.board)
         .then(res => {
-          console.log('data-getBoardDate', data)
-          console.log('res', res)
           data.board = res.data
         })
         .catch(err => {
@@ -110,27 +111,25 @@ export default defineComponent({
       axios
         .get(url.board + '/' + id)
         .then(response => {
-          console.log('response.data', response.data)
-          data.posts = response.data
+          data.topics = response.data
         })
-        .catch(function(err) {
+        .catch(err => {
           console.log(err)
         })
     }
     const getImgUrl = userid => {
-      return url.host + '/' + 'static/img/' + userid + '.png'
+      return url.host + '/' + 'static/head/' + (userid % 10) + '.png'
     }
     return {
       data,
       changeBoard,
       getImgUrl,
+      formatDate,
     }
   },
 })
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
 * {
   margin: 0;
   padding: 0;
@@ -140,131 +139,102 @@ img {
   width: 30px;
   height: 30px;
 }
-.Topic {
-  background-color: #e1e1e1;
-}
-.posts {
-  margin-top: 10px;
-}
-
-.Topic img {
-  height: 30px;
-  width: 30px;
-  vertical-align: middle;
-}
-
-.topic_title ul {
-  list-style: none;
-  width: 100%;
-  max-width: 1344px;
-  margin: 0 auto;
-}
-
-ul li:not(:first-child) {
-  padding: 9px;
-  font-size: 15px;
-  font-family: 'Helvetica Neue', 'Luxi Sans', 'DejaVu Sans', Tahoma,
-    'Hiragino Sans GB', STHeiti, sans-serif !important;
-  font-weight: 400;
-  background-color: white;
-  color: #333;
-  border-top: 1px solid #f0f0f0;
-}
-
-li:not(:first-child):hover {
-  background: #f5f5f5;
-}
-
-li:last-child:hover {
-  background: white;
-}
-
-li span {
-  line-height: 30px;
-}
-
-.allcount {
-  width: 70px;
-  display: inline-block;
-  text-align: center;
-  font-size: 12px;
-}
-
-.reply_count {
-  color: #9e78c0;
-  font-size: 14px;
-}
-
-.put_good,
-.put_top {
-  background: #80bd01;
-  padding: 2px 4px;
-  border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -o-border-radius: 3px;
-  color: #fff;
-  font-size: 12px;
-  margin-right: 10px;
-}
-
-.topiclist-tab {
-  background-color: #e5e5e5;
-  color: #999;
-  padding: 2px 4px;
-  border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -o-border-radius: 3px;
-  font-size: 12px;
-  margin-right: 10px;
-}
-
-.last_reply {
-  text-align: right;
-  min-width: 50px;
-  display: inline-block;
-  white-space: nowrap;
-  float: right;
-  color: #778087;
-  font-size: 12px;
-}
-
-.toobar {
-  height: 40px;
-  background-color: #f5f5f5;
-}
-
-.toobar span {
-  font-size: 14px;
-  color: #80bd01;
-  line-height: 40px;
-  margin: 0 10px;
-  cursor: pointer;
-}
-
-.toobar span:hover {
-  color: #9e78c0;
-}
-
-a {
-  text-decoration: none;
-  color: black;
-}
-
-a:hover {
-  text-decoration: underline;
+.TopicContainer {
+  //background-color: #e1e1e1;
+  box-shadow: 0 2px 20px 2px #dddddd47;
+  border: 1px solid #f1f1f1;
+  border-radius: 7px;
+  margin-left: 60px;
+  margin-right: 60px;
+  margin-top: 40px;
+  //max-width: 70%;
+  overflow: hidden;
+  .topics {
+    background: white;
+  }
+  .topicList {
+    li {
+      display: flex;
+      //padding: 9px;
+      font-size: 15px;
+      font-weight: 400;
+      background-color: white;
+      //color: #333;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .topic {
+      //margin-top: 20px;
+      padding: 6px 10px 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      div {
+        display: flex;
+        align-items: center;
+        .user_avatar {
+          img {
+            width: 46px;
+            height: 46px;
+            border-radius: 3px;
+            //border: 1px solid #f1f1f1;
+          }
+        }
+        .topic_title {
+          a {
+            color: #778087;
+          }
+          padding-left: 10px;
+          font-weight: bold;
+        }
+      }
+      .views {
+        font-size: 10px;
+        padding-right: 10px;
+      }
+    }
+  }
+  .toobar {
+    margin: 0;
+    padding: 8px 0;
+    overflow: hidden;
+    border-bottom: 1px solid #f1f1f1;
+    //background: #f5f5f5;
+    font-size: 16px;
+    color: #757575;
+    line-height: 60px;
+    text-indent: 31px;
+    box-shadow: 0 2px 20px 2px #dddddd47;
+    display: flex;
+    justify-content: flex-start;
+    span {
+      font-size: 16px;
+      color: #4d5d70;
+      line-height: 40px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    span:hover {
+      color: #9e78c0;
+    }
+  }
+  .newTopic {
+    padding: 10px;
+    box-shadow: 0 2px 20px 2px #dddddd47;
+    a {
+      color: #778087;
+      font-weight: bold;
+    }
+  }
+  a {
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
 }
 
 .loading {
   text-align: center;
   padding-top: 300px;
-}
-
-.user_avatar img,
-.user_big_avatar img {
-  width: 30px;
-  height: 30px;
-  border-radius: 3px;
 }
 </style>

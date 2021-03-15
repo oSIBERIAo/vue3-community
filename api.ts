@@ -9,9 +9,10 @@ const url: Url = {
   // index
   topic: '/v1/topic',
   topicxxx: '/v1/topic/xxx',
-  topic_add: '/api/topic/add',
+  topic_add: '/v1/topic/add',
+  topic_reply: '/v1/reply/add',
   board: '/v1/board',
-  topic_delete: '/api/topic/delete',
+  topic_delete: '/v1/topic/delete',
   uploads: '/uploads',
 
   // Admin_board

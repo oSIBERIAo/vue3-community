@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <img src="../assets/logo.png" alt="LOGO" />
+    <img src="../assets/logo1.png" alt="LOGO" />
     <ul>
       <li>
         <a href="#"><router-link to="/about">About</router-link></a>
@@ -44,8 +44,11 @@ export default defineComponent({
 .header {
   display: flex;
   padding: 5px;
-  background-color: rgba(16, 16, 16, 0.95);
+  //background-color: rgba(16, 16, 16, 0.95);
   justify-content: space-between;
+  background: #fff;
+  //border: 1px solid #d9d9d9;
+  box-shadow: 0 2px 20px 2px #dddddd47;
   ul {
     float: right;
     list-style: none;
@@ -56,14 +59,15 @@ export default defineComponent({
       padding: 10px 15px;
       a {
         text-decoration: none;
-        color: #ccc;
-        font-size: 13px;
+        color: #444;
+        font-weight: bold;
       }
     }
   }
   img {
-    max-width: 50px;
-    margin-left: 30px;
+    max-width: 40px;
+    max-height: 40px;
+    margin: 4px 0 4px 60px;
   }
 }
 </style>

@@ -100,7 +100,7 @@ export default defineComponent({
           }, 3000)
         })
         .catch(error => {
-          console.log(error)
+          // console.log(error)
           ElMessage.warning({
             message: '登录失败～',
             type: 'warning',

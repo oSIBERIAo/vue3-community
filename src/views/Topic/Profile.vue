@@ -1,19 +1,22 @@
 <template>
-  <div>
-    <h1 v-if="data.user">用户名：{{ data.user }}</h1>
-    <el-upload
-      ref="upload"
-      class="avatar-uploader"
-      :headers="headers"
-      :action="action"
-      :show-file-list="false"
-      :on-success="handleAvatarSuccess"
-      :before-upload="beforeAvatarUpload"
-    >
-      <img v-if="data.imageUrl" :src="data.imageUrl" class="avatar" />
-      <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-    </el-upload>
-    <button @click="logout">退出登陆</button>
+  <div class="Profile">
+    <span class="user" v-if="data.user">用户名：{{ data.user }}</span>
+    <div class="uploader">
+      <span>用户头像：</span>
+      <el-upload
+        ref="upload"
+        class="avatar-uploader"
+        :headers="headers"
+        :action="action"
+        :show-file-list="false"
+        :on-success="handleAvatarSuccess"
+        :before-upload="beforeAvatarUpload"
+      >
+        <img v-if="data.imageUrl" :src="data.imageUrl" class="avatar" />
+        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+      </el-upload>
+    </div>
+    <el-button class="logout" @click="logout">退出登陆</el-button>
   </div>
 </template>
 
@@ -63,18 +66,8 @@ export default defineComponent({
       return { Authorization: localStorage.getItem('token') }
     })
     const logout = () => {
-      axios
-        .get(url.logout, {
-          withCredentials: true,
-        })
-        .then(res => {
-          console.log('res', res)
-          router.push({ path: '/user_profile' })
-          location.reload()
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      localStorage.removeItem('token')
+      router.push('/')
     }
     const handleAvatarSuccess = (
       res: { token: string },
@@ -109,4 +102,33 @@ export default defineComponent({
 })
 </script>
 
-<style></style>
+<style scoped lang="scss">
+.Profile {
+  box-shadow: 0 2px 20px 2px #dddddd47;
+  border: 1px solid #f1f1f1;
+  border-radius: 7px;
+  margin-left: 60px;
+  margin-right: 60px;
+  margin-top: 40px;
+  overflow: hidden;
+  .user {
+    display: flex;
+    font-size: 15px;
+    font-weight: 800;
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 10px 20px;
+  }
+  .uploader {
+    display: flex;
+    font-size: 15px;
+    font-weight: 800;
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 10px 20px;
+  }
+  .logout {
+    margin: 10px;
+  }
+}
+</style>

@@ -6,6 +6,14 @@ import Header from '../components/Header.vue'
 const AdminRouter: Array<RouteRecordRaw> = [
   {
     path: '/',
+    name: 'Topic',
+    components: {
+      header: Header,
+      main: () => import('../views/Topic/Topic.vue'),
+    },
+  },
+  {
+    path: '/',
     name: 'Home',
     components: {
       header: Header,

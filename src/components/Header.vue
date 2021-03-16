@@ -2,17 +2,17 @@
   <div class="header">
     <img src="../assets/logo1.png" alt="LOGO" />
     <ul>
+      <!--      <li>-->
+      <!--        <a href="#"><router-link to="/about">About</router-link></a>-->
+      <!--      </li>-->
       <li>
-        <a href="#"><router-link to="/about">About</router-link></a>
+        <a href="#"><router-link to="/vue">Home</router-link></a>
       </li>
       <li>
         <a href="#"><router-link to="/topic">Topic</router-link></a>
       </li>
-      <li>
-        <a href="#"><router-link to="/vue">Home</router-link></a>
-      </li>
-      <li><a href="#">API</a></li>
-      <li><a href="#">关于</a></li>
+      <!--      <li><a href="#">API</a></li>-->
+      <!--      <li><a href="#">关于</a></li>-->
       <li>
         <a href="#"><router-link to="/user_profile">个人</router-link></a>
       </li>

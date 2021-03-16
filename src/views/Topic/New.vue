@@ -102,7 +102,7 @@ export default defineComponent({
           data.isLoading = false
           console.log(response)
           data.data = response.data
-          router.push({ path: `/topic/detail?id=${response.data.id}` })
+          router.push(`/topic/detail?id=${response.data.id}`)
         })
         .catch(function(err) {
           console.log(err)

@@ -49,7 +49,7 @@ if (localStorage.getItem('token') !== '') {
   axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
 }
 export default defineComponent({
-  name: 'Topic_detail',
+  name: 'topic_detail',
   setup() {
     const route = useRoute()
     type Data = {

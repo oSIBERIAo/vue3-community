@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import Admin from '../views/Admin.vue'
 import Header from '../components/Header.vue'
 
-let Admin_Router: Array<RouteRecordRaw> = [
+const AdminRouter: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
@@ -63,7 +63,7 @@ let Admin_Router: Array<RouteRecordRaw> = [
   },
 ]
 
-let Topic_Router: Array<RouteRecordRaw> = [
+const TopicRouter: Array<RouteRecordRaw> = [
   {
     path: '/topic/detail',
     name: 'topic_detail',
@@ -83,8 +83,8 @@ let Topic_Router: Array<RouteRecordRaw> = [
 ]
 
 let routes: Array<RouteRecordRaw> = []
-routes = routes.concat(Admin_Router)
-routes = routes.concat(Topic_Router)
+routes = routes.concat(AdminRouter)
+routes = routes.concat(TopicRouter)
 console.log('routes', routes)
 
 const router = createRouter({

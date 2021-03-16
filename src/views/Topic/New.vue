@@ -1,33 +1,39 @@
 <template>
   <div class="Topic_New">
-    <div style="margin: 20px 0;"></div>
-    <p>标题：</p>
-    <el-input
-      type="textarea"
-      autosize
-      placeholder="请输入内容"
-      v-model="title"
-    ></el-input>
-    <div style="margin: 20px 0;"></div>
-    <p>板块：</p>
-    <el-select v-model="boardId" placeholder="请选择">
-      <el-option
-        v-for="item in options"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-      ></el-option>
-    </el-select>
-    <div style="margin: 20px 0;"></div>
-    <p>内容：</p>
-    <el-input
-      type="textarea"
-      :autosize="{ minRows: 2, maxRows: 4 }"
-      placeholder="请输入内容"
-      v-model="content"
-    ></el-input>
-    <el-button type="primary" @click="onSubmit">立即创建</el-button>
-    {{ this.title }}: {{ this.content }}
+    <div class="title">
+      <span>标题：</span>
+      <el-input
+        id="title"
+        type="textarea"
+        autosize
+        placeholder="请输入内容"
+        v-model="data.title"
+      ></el-input>
+    </div>
+    <div class="board">
+      <span>板块：</span>
+      <el-select v-model="data.boardId" placeholder="请选择">
+        <el-option
+          v-for="item in data.options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        ></el-option>
+      </el-select>
+    </div>
+    <div class="content">
+      <span>内容：</span>
+      <el-input
+        type="textarea"
+        :autosize="{ minRows: 8, maxRows: 50 }"
+        placeholder="请输入内容"
+        v-model="data.content"
+      ></el-input>
+    </div>
+    <el-button class="onSubmit" type="primary" @click="onSubmit"
+      >立即创建</el-button
+    >
+    <!--    {{ data.title }}: {{ data.content }}-->
   </div>
 </template>
 <script lang="ts">
@@ -42,7 +48,7 @@ if (localStorage.getItem('token') !== '') {
   axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
 }
 export default defineComponent({
-  name: 'Topic_new',
+  name: 'topic_new',
   setup() {
     const route = useRoute()
     const router = useRouter()
@@ -64,16 +70,15 @@ export default defineComponent({
       boardId: '',
       isLoading: false,
     })
-    const refData = toRefs(data)
     const getDate = () => {
       axios
         .get(url.board)
         .then(response => {
           data.board = response.data
           console.log('response.data', response.data)
-          const options = []
-          response.data.forEach(e => {
-            const o = {}
+          const options: any = []
+          response.data.forEach((e: { id: any; content: any }) => {
+            const o: any = {}
             o.value = e.id
             o.label = e.content
             options.push(o)
@@ -108,11 +113,66 @@ export default defineComponent({
       getDate()
     })
     return {
-      // data,
-      ...refData,
+      data,
       getDate,
       onSubmit,
     }
   },
 })
 </script>
+<style scoped lang="scss">
+.Topic_New {
+  box-shadow: 0 2px 20px 2px #dddddd47;
+  border: 1px solid #f1f1f1;
+  border-radius: 7px;
+  margin-left: 60px;
+  margin-right: 60px;
+  margin-top: 40px;
+  overflow: hidden;
+  .title {
+    display: flex;
+    padding: 9px;
+    font-size: 15px;
+    font-weight: 400;
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    span {
+      width: 60px;
+      margin: 10px;
+    }
+  }
+  .board {
+    display: flex;
+    padding: 9px;
+    font-size: 15px;
+    font-weight: 400;
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    span {
+      width: 60px;
+      margin: 7px;
+    }
+  }
+  .content {
+    display: flex;
+    padding: 9px;
+    font-size: 15px;
+    font-weight: 400;
+    background-color: white;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    span {
+      width: 58px;
+      margin: 10px;
+    }
+  }
+  button {
+    margin: 10px 0;
+    color: #4d5d70;
+    background-color: #f1f1f1;
+    border: #f1f1f1;
+  }
+}
+</style>

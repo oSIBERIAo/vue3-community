@@ -1,13 +1,12 @@
 <template>
-  <div>
-    <br />
+  <div class="Signup">
     <el-form
       status-icon
       :rules="rules"
       :model="ruleForm"
       ref="ruleFormRef"
       label-width="100px"
-      class="demo-ruleForm"
+      class="ruleForm"
     >
       <el-form-item label="用户名" prop="username">
         <el-input v-model="ruleForm.username"></el-input>
@@ -159,4 +158,23 @@ export default defineComponent({
 })
 </script>
 
-<style></style>
+<style scoped lang="scss">
+.Signup {
+  box-shadow: 0 2px 20px 2px #dddddd47;
+  border: 1px solid #f1f1f1;
+  border-radius: 7px;
+  margin-left: 60px;
+  margin-right: 60px;
+  margin-top: 40px;
+  overflow: hidden;
+  padding: 30px 20px 0 10px;
+  .ruleForm {
+    button {
+      margin: 10px 10px;
+      color: #4d5d70;
+      background-color: #f1f1f1;
+      border: #f1f1f1;
+    }
+  }
+}
+</style>

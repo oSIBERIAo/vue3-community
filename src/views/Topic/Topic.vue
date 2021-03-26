@@ -112,6 +112,7 @@ export default defineComponent({
         .get(url.board + '/' + id)
         .then(response => {
           data.topics = response.data
+          console.log('board---topics', response.data)
         })
         .catch(err => {
           console.log(err)
@@ -220,6 +221,7 @@ img {
   .newTopic {
     padding: 10px;
     box-shadow: 0 2px 20px 2px #dddddd47;
+    text-align: center;
     a {
       color: #778087;
       font-weight: bold;

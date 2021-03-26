@@ -22,17 +22,15 @@
       </el-select>
     </div>
     <div class="content">
-      <span>内容：</span>
-      <el-input
-        type="textarea"
-        :autosize="{ minRows: 8, maxRows: 50 }"
-        placeholder="请输入内容"
+      <v-md-editor
         v-model="data.content"
-      ></el-input>
+        height="400px"
+        @save="onUpdate"
+      ></v-md-editor>
     </div>
-    <el-button class="onSubmit" type="primary" @click="onSubmit"
-      >立即创建</el-button
-    >
+    <div class="onSubmit">
+      <el-button type="primary" @click="onSubmit">立即创建</el-button>
+    </div>
     <!--    {{ data.title }}: {{ data.content }}-->
   </div>
 </template>
@@ -40,9 +38,10 @@
 // import pagination from './Pagination'
 import { url } from '../../../api'
 import axios from 'axios'
-import { defineComponent, onBeforeMount, reactive, ref, toRefs } from 'vue'
+import { defineComponent, onBeforeMount, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { formatDate } from '@/libs/libs'
+import { ElMessage } from 'element-plus'
 
 if (localStorage.getItem('token') !== '') {
   axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
@@ -60,6 +59,7 @@ export default defineComponent({
       options: never[]
       boardId: string
       isLoading: boolean
+      input: string
     }
     const data = reactive<Data>({
       title: '',
@@ -69,6 +69,7 @@ export default defineComponent({
       options: [],
       boardId: '',
       isLoading: false,
+      input: '# hello',
     })
     const getDate = () => {
       axios
@@ -85,6 +86,19 @@ export default defineComponent({
           })
           data.options = options
           console.log('data-----', data)
+        })
+        .catch(function(err) {
+          console.log(err)
+        })
+    }
+    const getEditorTopic = () => {
+      axios
+        .get(url.topic + '/' + route.query.id)
+        .then(response => {
+          data.title = response.data.title
+          data.boardId = response.data.board_id
+          data.content = response.data.content
+          console.log('getEditorTopic', response)
         })
         .catch(function(err) {
           console.log(err)
@@ -108,14 +122,43 @@ export default defineComponent({
           console.log(err)
         })
     }
+    const onUpdate = () => {
+      console.log('submit!')
+      const params = new URLSearchParams()
+      params.append('title', data.title)
+      params.append('content', data.content)
+      params.append('board_id', data.boardId)
+      params.append('topic_id', String(route.query.id))
+      axios
+        .post(url.topic_update, params)
+        .then(response => {
+          data.isLoading = false
+          console.log(response)
+          data.data = response.data
+          // router.push(`/topic/detail?id=${response.data.id}`)
+          ElMessage.success({
+            message: '保存成功',
+            type: 'success',
+          })
+        })
+        .catch(function(err) {
+          console.log(err)
+        })
+    }
     onBeforeMount(() => {
       console.log('onBeforeMount')
       getDate()
+      if (route.query.id) {
+        console.log('route.query.id', route.query.id)
+        getEditorTopic()
+      }
     })
     return {
       data,
       getDate,
       onSubmit,
+      onUpdate,
+      formatDate,
     }
   },
 })
@@ -151,28 +194,27 @@ export default defineComponent({
     border-bottom: 1px solid #f0f0f0;
     align-items: center;
     span {
-      width: 60px;
-      margin: 7px;
+      width: 54px;
+      margin: 10px;
     }
   }
   .content {
     display: flex;
-    padding: 9px;
+    //padding: 9px;
     font-size: 15px;
     font-weight: 400;
     background-color: white;
     border-bottom: 1px solid #f0f0f0;
     align-items: center;
-    span {
-      width: 58px;
-      margin: 10px;
-    }
   }
-  button {
-    margin: 10px 0;
-    color: #4d5d70;
-    background-color: #f1f1f1;
-    border: #f1f1f1;
+  .onSubmit {
+    text-align: center;
+    button {
+      margin: 10px 0;
+      color: #4d5d70;
+      background-color: #f1f1f1;
+      border: #f1f1f1;
+    }
   }
 }
 </style>

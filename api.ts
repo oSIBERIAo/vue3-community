@@ -12,6 +12,7 @@ const url: Url = {
   topic_add: '/v1/topic/add',
   topic_reply: '/v1/reply/add',
   board: '/v1/board',
+  topic_update: '/v1/topic/update',
   topic_delete: '/v1/topic/delete',
   uploads: '/uploads',
 

@@ -1,12 +1,21 @@
 <template>
   <div class="Topic_Detail" ref="detailDom">
     <div class="topic">
-      <div class="topic_title">{{ topic.title }}</div>
-      <div class="topic_content">{{ topic.content }}</div>
+      <div class="topic_title">{{ data.topic.title }}</div>
+      <!--      <div class="topic_content">{{ data.topic.content }}</div>-->
+      <v-md-preview
+        class="topic_content"
+        :text="data.topic.content"
+      ></v-md-preview>
+      {{ text }}
+      <!--      <v-md-preview v-bind="text"></v-md-preview>-->
       <!--            <p>{{ formatDate(topic.created_time) }}/{{ post.views }}</p>-->
-      <!--      <el-button type="primary" @click="onDelete" v-if="token"-->
-      <!--        >删除帖子</el-button-->
-      <!--      >-->
+      <el-button type="primary" @click="onDelete" v-if="judgeAuthor">
+        删除帖子
+      </el-button>
+      <el-button type="primary" @click="onEditor" v-if="judgeAuthor">
+        编辑帖子
+      </el-button>
     </div>
     <br />
     <br />
@@ -41,15 +50,28 @@
 // import pagination from './Pagination'
 import { url } from '../../../api'
 import axios from 'axios'
-import { defineComponent, onBeforeMount, reactive, ref, toRefs } from 'vue'
+import {
+  defineComponent,
+  onBeforeMount,
+  reactive,
+  ref,
+  toRefs,
+  computed,
+} from 'vue'
 import { useRoute } from 'vue-router'
 import { formatDate } from '@/libs/libs'
+import router from '@/router'
 
 if (localStorage.getItem('token') !== '') {
   axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
 }
 export default defineComponent({
   name: 'topic_detail',
+  data() {
+    return {
+      text: '',
+    }
+  },
   setup() {
     const route = useRoute()
     type Data = {
@@ -58,6 +80,8 @@ export default defineComponent({
       topic: never[]
       replies: string[]
       token: null
+      userId: number
+      markdown: string
     }
     const data = reactive<Data>({
       isLoading: false,
@@ -65,6 +89,8 @@ export default defineComponent({
       topic: [],
       replies: [],
       token: null,
+      userId: -1,
+      markdown: 'test~~~~~haha',
     })
     const refData = toRefs(data)
     const detailDom: any = ref()
@@ -76,6 +102,7 @@ export default defineComponent({
           data.topic = response.data
           data.replies = JSON.parse(response.data.replies)
           data.token = response.data.token
+          data.userId = response.data.user_id
           console.log('response', response)
         })
         .catch(function(err) {
@@ -99,21 +126,25 @@ export default defineComponent({
           console.log(err)
         })
     }
+    const judgeAuthor = computed(() => {
+      return data.userId == Number(localStorage.getItem('user_id'))
+    })
     const onDelete = () => {
       const params = new URLSearchParams()
       params.append('topic_id', String(route.query.id))
-      // params.append('csrf_token', this.token)
       axios
         .post(url.topic_delete, params)
         .then(response => {
           console.log(response)
           data.replies.push(response.data)
-          // this.$el.querySelector('#content').value = ''
-          // data.$router.push({ path: '/' })
+          router.push('/')
         })
         .catch(function(err) {
           console.log(err)
         })
+    }
+    const onEditor = () => {
+      router.push('/topic/new?id=' + route.query.id)
     }
     onBeforeMount(() => {
       console.log('onBeforeMount')
@@ -125,9 +156,11 @@ export default defineComponent({
       getDate,
       onSubmit,
       onDelete,
+      onEditor,
       formatDate,
       getImgUrl,
       detailDom,
+      judgeAuthor,
     }
   },
 })
@@ -144,6 +177,7 @@ export default defineComponent({
     margin-top: 40px;
     //max-width: 70%;
     overflow: hidden;
+    text-align: center;
     .topic_title {
       margin: 0;
       padding: 4px 0;
@@ -165,11 +199,17 @@ export default defineComponent({
       overflow: hidden;
       border-bottom: 1px solid #f1f1f1;
       //font-size: 16px;
-      text-indent: 30px;
+      //text-indent: 30px;
       box-shadow: 0 2px 20px 2px #dddddd47;
       color: #4d5d70;
       text-align: justify;
       line-height: 30px;
+    }
+    button {
+      margin: 10px 10px;
+      color: #4d5d70;
+      background-color: #f1f1f1;
+      border: #f1f1f1;
     }
   }
   .replies {
@@ -216,7 +256,6 @@ export default defineComponent({
         margin: 30px 0 20px 0;
         color: #4d5d70;
         background-color: #f1f1f1;
-        border-color: #f1f1f1;
         border: 1px solid #f1f1f1;
       }
     }

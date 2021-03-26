@@ -94,6 +94,8 @@ export default defineComponent({
             'token',
             'Basic ' + btoa(response.data.token + ':'),
           )
+          localStorage.setItem('user_id', response.data.user_id)
+          localStorage.setItem('user_username', response.data.user_username)
           setTimeout(() => {
             router.push('/')
           }, 3000)

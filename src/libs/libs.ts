@@ -1,8 +1,8 @@
 const formatDate = (str: string | number | Date) => {
   if (!str) return ''
   str = Number(str + '000')
-  let date = new Date(str)
-  let time = new Date().getTime() - date.getTime() //现在的时间-传入的时间 = 相差的时间（单位 = 毫秒）
+  const date = new Date(str)
+  const time = new Date().getTime() - date.getTime() //现在的时间-传入的时间 = 相差的时间（单位 = 毫秒）
   if (time < 0) {
     return ''
   } else if (time / 1000 < 30) {

@@ -47,6 +47,15 @@
         </li>
       </ul>
     </div>
+    <div class="pagination">
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :page-count="data.pageCount"
+        @current-change="changePage"
+      >
+      </el-pagination>
+    </div>
     <div class="newTopic">
       <a>
         <router-link
@@ -80,13 +89,15 @@ export default defineComponent({
       topics: [],
       postpage: 1,
       board: null,
+      pageCount: Number,
     })
     const getTopicDate = () => {
       axios
         .get(url.topic)
         .then(res => {
-          console.log('getTopicDate', res.data)
-          data.topics = res.data
+          console.log('getTopicDate', JSON.parse(res.data.items))
+          data.topics = JSON.parse(res.data.items)
+          data.pageCount = res.data.pages
         })
         .catch(err => {
           console.log(err)
@@ -121,11 +132,29 @@ export default defineComponent({
     const getImgUrl = userid => {
       return url.host + '/' + 'static/head/' + (userid % 10) + '.png'
     }
+    const changePage = page => {
+      console.log('page', page)
+      axios
+        .get(url.topic, {
+          params: {
+            page: page,
+          },
+        })
+        .then(res => {
+          console.log('getTopicDate', JSON.parse(res.data.items))
+          data.topics = JSON.parse(res.data.items)
+          data.pageCount = res.data.pages
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
     return {
       data,
       changeBoard,
       getImgUrl,
       formatDate,
+      changePage,
     }
   },
 })
@@ -226,6 +255,9 @@ img {
       color: #778087;
       font-weight: bold;
     }
+  }
+  .pagination {
+    padding: 20px;
   }
   a {
     text-decoration: none;

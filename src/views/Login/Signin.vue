@@ -93,7 +93,7 @@ export default defineComponent({
           })
           setTimeout(() => {
             router.push('/')
-          }, 2000)
+          }, 500)
           console.log('cg-data', data)
         })
         .catch(e => {

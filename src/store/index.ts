@@ -61,14 +61,14 @@ export const store = createStore<GlobalDataProps>({
       axios.defaults.headers.common.Authorization =
         'Basic ' + btoa(rawData.token + ':')
       localStorage.setItem('token', 'Basic ' + btoa(rawData.token + ':'))
-      localStorage.setItem('user_id', rawData.user_id)
-      localStorage.setItem('user_username', rawData.user_username)
+      // localStorage.setItem('user_id', rawData.user_id)
+      // localStorage.setItem('user_username', rawData.user_username)
       console.log('111', state)
     },
     logout(state) {
       state.token = ''
       state.user = { isLogin: false }
-      localStorage.remove('token')
+      localStorage.removeItem('token')
       delete axios.defaults.headers.common.Authorization
     },
     fetchCurrentUserProfile(state, rawData) {
@@ -83,6 +83,9 @@ export const store = createStore<GlobalDataProps>({
         method: 'post',
         data: payload,
       })
+    },
+    logout({ commit }) {
+      commit('logout')
     },
     loginAndFetch({ dispatch }, loginData) {
       // console.log('111')

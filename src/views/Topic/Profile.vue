@@ -27,7 +27,6 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { url } from '../../../api'
 import { ElMessage } from 'element-plus'
-const router = useRouter()
 console.log('url', url.register)
 console.log('axios', axios)
 if (localStorage.getItem('token') !== '') {
@@ -38,9 +37,11 @@ export default defineComponent({
   name: 'Signup',
   setup() {
     const store = useStore()
+    const router = useRouter()
     const data = reactive({
       user: '',
       imageUrl: '',
+      fileType: ['image/jpeg', 'image/gif', 'image/png'],
       token: '',
     })
     const user = computed(() => store.state.user)
@@ -62,8 +63,12 @@ export default defineComponent({
       return { Authorization: localStorage.getItem('token') }
     })
     const logout = () => {
-      localStorage.removeItem('token')
-      router.push('/')
+      store.dispatch('logout').then(() => {
+        ElMessage.success('退出登录成功～')
+        setTimeout(() => {
+          router.push('/')
+        }, 500)
+      })
     }
     const handleAvatarSuccess = (
       res: { token: string },
@@ -74,15 +79,13 @@ export default defineComponent({
       console.log('file.raw', file.raw)
     }
     const beforeAvatarUpload = (file: { type: string; size: number }) => {
-      // const isAllow_file = this.fileType.includes(file.type)
       const isAllow = data.fileType.includes(file.type)
       const isLt2M = file.size / 1024 / 1024 < 2
-      // console.log('isAllow_file', isAllow_file)
       if (!isAllow) {
-        // this.$message.error("上传头像图片只能是 JPG / PNG /GiF格式!");
+        ElMessage.error('上传头像图片只能是 JPG / PNG /GiF格式!')
       }
       if (!isLt2M) {
-        // this.$message.error("上传头像图片大小不能超过 2MB!");
+        ElMessage.error('上传头像图片大小不能超过 2MB!')
       }
       return isAllow && isLt2M
     }

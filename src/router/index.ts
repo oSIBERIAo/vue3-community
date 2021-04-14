@@ -3,6 +3,9 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 import Admin from '../views/Admin.vue'
 import Header from '../components/Header.vue'
 
+import axios from 'axios'
+import { store } from '../store'
+
 const AdminRouter: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -48,6 +51,7 @@ const AdminRouter: Array<RouteRecordRaw> = [
       header: Header,
       main: () => import('../views/Login/Signup.vue'),
     },
+    meta: { redirectAlreadyLogin: true },
   },
   {
     path: '/signin',
@@ -56,6 +60,7 @@ const AdminRouter: Array<RouteRecordRaw> = [
       header: Header,
       main: () => import('../views/Login/Signin.vue'),
     },
+    meta: { redirectAlreadyLogin: true },
   },
   {
     path: '/user_profile',
@@ -64,6 +69,7 @@ const AdminRouter: Array<RouteRecordRaw> = [
       header: Header,
       main: () => import('../views/Topic/Profile.vue'),
     },
+    meta: { requiredLogin: true },
   },
   {
     path: '/topic',
@@ -102,6 +108,42 @@ console.log('routes', routes)
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
+})
+
+router.beforeEach((to, from, next) => {
+  const { user, token } = store.state
+  const { requiredLogin, redirectAlreadyLogin } = to.meta
+  if (!user.isLogin) {
+    if (token) {
+      axios.defaults.headers.common.Authorization = token
+      store
+        .dispatch('fetchCurrentUserProfile')
+        .then(() => {
+          if (redirectAlreadyLogin) {
+            next('/')
+          } else {
+            next()
+          }
+        })
+        .catch(e => {
+          console.error(e)
+          store.commit('logout')
+          next('signin')
+        })
+    } else {
+      if (requiredLogin) {
+        next('/signin')
+      } else {
+        next()
+      }
+    }
+  } else {
+    if (redirectAlreadyLogin) {
+      next('/')
+    } else {
+      next()
+    }
+  }
 })
 
 export default router

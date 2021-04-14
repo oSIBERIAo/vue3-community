@@ -22,9 +22,11 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref, computed, onBeforeMount } from 'vue'
+import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { url } from '../../../api'
+import { ElMessage } from 'element-plus'
 const router = useRouter()
 console.log('url', url.register)
 console.log('axios', axios)
@@ -35,25 +37,19 @@ if (localStorage.getItem('token') !== '') {
 export default defineComponent({
   name: 'Signup',
   setup() {
+    const store = useStore()
     const data = reactive({
       user: '',
       imageUrl: '',
-      fileType: ['image/jpeg', 'image/gif', 'image/png'],
       token: '',
     })
+    const user = computed(() => store.state.user)
+    console.log('user', user.value)
 
     const getProfileDate = () => {
-      axios
-        .get(url.profile)
-        .then(res => {
-          data.token = res.data.token
-          data.user = res.data.username
-          data.imageUrl = url.host + '/' + 'static/img/' + res.data.user_image
-          // console.log('data', data)
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      data.token = user.value.token
+      data.user = user.value.username
+      data.imageUrl = url.host + '/' + 'static/img/' + user.value.user_image
     }
     onBeforeMount(() => {
       console.log('onBeforeMount')
@@ -91,6 +87,7 @@ export default defineComponent({
       return isAllow && isLt2M
     }
     return {
+      store,
       data,
       logout,
       action,

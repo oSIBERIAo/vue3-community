@@ -35,6 +35,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
 import { url } from '../../../api'
+import { useStore } from 'vuex'
 
 console.log('url', url.register)
 console.log('axios', axios)
@@ -42,6 +43,7 @@ console.log('axios', axios)
 export default defineComponent({
   name: 'Signup',
   setup() {
+    const store = useStore()
     const router = useRouter()
     const ruleForm = reactive({
       username: '',
@@ -78,30 +80,24 @@ export default defineComponent({
       username: string | Blob
       password: string | Blob
     }) => {
-      const data = new FormData()
-      data.append('username', form.username)
-      data.append('password', form.password)
-      axios
-        .post(url.token, data)
-        .then(response => {
-          if (response.status === 201) {
-            ElMessage.success({
-              message: '恭喜你，登录成功，即将转跳至首页页面～',
-              type: 'success',
-            })
-          }
-          localStorage.setItem(
-            'token',
-            'Basic ' + btoa(response.data.token + ':'),
-          )
-          localStorage.setItem('user_id', response.data.user_id)
-          localStorage.setItem('user_username', response.data.user_username)
+      const payload = new FormData()
+      payload.append('username', form.username)
+      payload.append('password', form.password)
+      console.log('store', store)
+      store
+        .dispatch('loginAndFetch', payload)
+        .then(data => {
+          ElMessage.success({
+            message: '恭喜你，登录成功，即将转跳至首页页面～',
+            type: 'success',
+          })
           setTimeout(() => {
             router.push('/')
-          }, 3000)
+          }, 2000)
+          console.log('cg-data', data)
         })
-        .catch(error => {
-          // console.log(error)
+        .catch(e => {
+          console.log(e)
           ElMessage.warning({
             message: '登录失败～',
             type: 'warning',

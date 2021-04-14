@@ -12,7 +12,7 @@
 #app {
   //font-family: Avenir, Helvetica, Arial, sans-serif;
   font-family: Apercu, 'PingFang SC', 'Microsoft YaHei', Arial, SimHei,
-  sans-serif;
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   //text-align: center;

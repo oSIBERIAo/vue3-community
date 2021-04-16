@@ -120,9 +120,9 @@ export const store = createStore<GlobalDataProps>({
     fetchBoards({ state, commit }) {
       return asyncAndCommit(url.board, 'fetchBoards', commit)
     },
-    fetchTopicsByBoard({ commit }, { id, params }) {
+    fetchTopicsByBoard({ commit }, params) {
       return asyncAndCommit(
-        url.board + '/' + id,
+        url.board + '/' + params.id,
         'fetchTopicsByBoard',
         commit,
         params,

@@ -112,11 +112,12 @@ export default defineComponent({
           page: page,
         },
       }
-      if (currentBoardId.value === 0) {
-        store.dispatch('fetchTopics', payload)
-      } else {
-        store.dispatch('fetchTopicsByBoard', payload)
-      }
+      // if (currentBoardId.value === 0) {
+      //   store.dispatch('fetchTopics', payload)
+      // } else {
+      //   store.dispatch('fetchTopicsByBoard', payload)
+      // }
+      store.dispatch('fetchTopicsByBoard', payload)
     }
     return {
       changeBoard,

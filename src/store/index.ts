@@ -25,6 +25,11 @@ export interface UserProps {
 export interface GlobalDataProps {
   token: string
   user: UserProps
+  topicsData: {
+    topics?: {}
+    pageCount?: number
+  }
+  board: object[]
 }
 
 const asyncAndCommit = async (
@@ -47,23 +52,21 @@ export const store = createStore<GlobalDataProps>({
   state: {
     token: localStorage.getItem('token') || '',
     user: { isLogin: false },
+    topicsData: {},
+    board: [],
   },
   mutations: {
-    // login(state) {
-    //   state.user = { ...state.user, isLogin: true, username: 'gua' }
-    // },
     login(state, rawData) {
       console.log('rawData', rawData)
       const { token } = rawData
       state.token = token
       state.user = { isLogin: true, ...rawData }
-      // localStorage.setItem('token', token)
       axios.defaults.headers.common.Authorization =
         'Basic ' + btoa(rawData.token + ':')
       localStorage.setItem('token', 'Basic ' + btoa(rawData.token + ':'))
+      // TODO 改服务器token
       // localStorage.setItem('user_id', rawData.user_id)
       // localStorage.setItem('user_username', rawData.user_username)
-      console.log('111', state)
     },
     logout(state) {
       state.token = ''
@@ -72,9 +75,25 @@ export const store = createStore<GlobalDataProps>({
       delete axios.defaults.headers.common.Authorization
     },
     fetchCurrentUserProfile(state, rawData) {
-      console.log('fetchCurrentUserProfile', rawData)
       state.user = { isLogin: true, ...rawData }
-      console.log('fetchCurrentUserProfile-state.user', state.user)
+    },
+    fetchTopics(state, rawData) {
+      const { items, pages } = rawData
+      state.topicsData = {
+        topics: JSON.parse(items),
+        pageCount: pages,
+      }
+    },
+    fetchBoards(state, rawData) {
+      // const { board } = rawData
+      state.board = { ...rawData }
+    },
+    fetchTopicsByBoard(state, rawData) {
+      const { items, pages } = rawData
+      state.topicsData = {
+        topics: JSON.parse(items),
+        pageCount: pages,
+      }
     },
   },
   actions: {
@@ -88,14 +107,26 @@ export const store = createStore<GlobalDataProps>({
       commit('logout')
     },
     loginAndFetch({ dispatch }, loginData) {
-      // console.log('111')
       return dispatch('login', loginData).then(() => {
-        // console.log('222')
         return dispatch('fetchCurrentUserProfile')
       })
     },
     fetchCurrentUserProfile({ commit }) {
       return asyncAndCommit(url.profile, 'fetchCurrentUserProfile', commit)
+    },
+    fetchTopics({ state, commit }, params) {
+      return asyncAndCommit(url.topic, 'fetchTopics', commit, params)
+    },
+    fetchBoards({ state, commit }) {
+      return asyncAndCommit(url.board, 'fetchBoards', commit)
+    },
+    fetchTopicsByBoard({ commit }, { id, params }) {
+      return asyncAndCommit(
+        url.board + '/' + id,
+        'fetchTopicsByBoard',
+        commit,
+        params,
+      )
     },
   },
   modules: {},

@@ -1,9 +1,5 @@
 <template>
   <div class="TopicContainer">
-    <!--    <div class="loading" v-if="isLoading">-->
-    <!--      &lt;!&ndash;      <img src="../assets/loading.gif" alt />&ndash;&gt;-->
-    <!--    </div>-->
-    <!--    <div class="topics" v-else>-->
     <div class="topics">
       <ul class="board">
         <li>
@@ -12,7 +8,7 @@
               全部
             </span>
             <span
-              v-for="(item, index) in data.board"
+              v-for="(item, index) in board"
               :key="index"
               @click="changeBoard(item.id)"
             >
@@ -22,7 +18,7 @@
         </li>
       </ul>
       <ul class="topicList">
-        <li class="topic" v-for="topic in data.topics" :key="topic.id">
+        <li class="topic" v-for="topic in topicsData.topics" :key="topic.id">
           <div>
             <a class="user_avatar">
               <img :src="getImgUrl(topic.user_id)" alt="" />
@@ -39,7 +35,6 @@
                 >{{ topic.title }}</router-link
               >
             </a>
-            <!--          <span>{{ topic.content }}</span>-->
           </div>
           <span class="views">
             {{ formatDate(topic.updated_time) }} / {{ topic.views }}浏览
@@ -51,7 +46,7 @@
       <el-pagination
         background
         layout="prev, pager, next"
-        :page-count="data.pageCount"
+        :page-count="topicsData.pageCount"
         @current-change="changePage"
       >
       </el-pagination>
@@ -72,10 +67,11 @@
 <script>
 import { url } from '../../../api'
 import axios from 'axios'
-import { defineComponent, onBeforeMount, reactive, ref } from 'vue'
+import { defineComponent, onBeforeMount, ref, computed } from 'vue'
 import { formatDate } from '../../libs/libs'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useStore } from 'vuex'
 
 if (localStorage.getItem('token') !== '') {
   axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
@@ -84,77 +80,51 @@ if (localStorage.getItem('token') !== '') {
 export default defineComponent({
   name: 'Topic',
   setup() {
-    const data = reactive({
-      isLoading: false,
-      topics: [],
-      postpage: 1,
-      board: null,
-      pageCount: Number,
-    })
-    const getTopicDate = () => {
-      axios
-        .get(url.topic)
-        .then(res => {
-          console.log('getTopicDate', JSON.parse(res.data.items))
-          data.topics = JSON.parse(res.data.items)
-          data.pageCount = res.data.pages
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    }
-    const getBoardDate = () => {
-      axios
-        .get(url.board)
-        .then(res => {
-          data.board = res.data
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    }
+    const store = useStore()
+    const currentBoardId = ref(0)
+    const topicsData = computed(() => store.state.topicsData)
+    const board = computed(() => store.state.board)
+
     onBeforeMount(() => {
-      console.log('onBeforeMount')
-      getTopicDate()
-      getBoardDate()
+      store.dispatch('fetchTopics')
+      store.dispatch('fetchBoards')
     })
-    const changeBoard = id => {
-      axios
-        .get(url.board + '/' + id)
-        .then(response => {
-          data.topics = response.data
-          console.log('board---topics', response.data)
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    }
+
     const getImgUrl = userid => {
       return url.host + '/' + 'static/head/' + (userid % 10) + '.png'
     }
-    const changePage = page => {
-      console.log('page', page)
-      axios
-        .get(url.topic, {
+    const changeBoard = id => {
+      const payload = {
+        id: id,
+        params: {
           params: {
-            page: page,
+            page: 1,
           },
-        })
-        .then(res => {
-          console.log('getTopicDate', JSON.parse(res.data.items))
-          data.topics = JSON.parse(res.data.items)
-          data.pageCount = res.data.pages
-        })
-        .catch(err => {
-          console.log(err)
-        })
+        },
+      }
+      currentBoardId.value = id
+      store.dispatch('fetchTopicsByBoard', payload)
+    }
+    const changePage = page => {
+      const payload = {
+        id: currentBoardId.value,
+        params: {
+          page: page,
+        },
+      }
+      if (currentBoardId.value === 0) {
+        store.dispatch('fetchTopics', payload)
+      } else {
+        store.dispatch('fetchTopicsByBoard', payload)
+      }
     }
     return {
-      data,
       changeBoard,
       getImgUrl,
       formatDate,
       changePage,
+      topicsData,
+      board,
     }
   },
 })

@@ -47,6 +47,7 @@
         background
         layout="prev, pager, next"
         :page-count="topicsData.pageCount"
+        :current-page="Number(currentPage.page)"
         @current-change="changePage"
       >
       </el-pagination>
@@ -81,12 +82,16 @@ export default defineComponent({
   name: 'Topic',
   setup() {
     const store = useStore()
+    const router = useRouter()
     const currentBoardId = ref(0)
     const topicsData = computed(() => store.state.topicsData)
     const board = computed(() => store.state.board)
+    const currentPage = ref(router.currentRoute.value.query || { page: 1 })
 
     onBeforeMount(() => {
-      store.dispatch('fetchTopics')
+      store.dispatch('fetchTopics', {
+        params: currentPage.value,
+      })
       store.dispatch('fetchBoards')
     })
 
@@ -112,12 +117,11 @@ export default defineComponent({
           page: page,
         },
       }
-      // if (currentBoardId.value === 0) {
-      //   store.dispatch('fetchTopics', payload)
-      // } else {
-      //   store.dispatch('fetchTopicsByBoard', payload)
-      // }
-      store.dispatch('fetchTopicsByBoard', payload)
+      store.dispatch('fetchTopicsByBoard', payload).then(() => {
+        router.push({
+          query: { page: page },
+        })
+      })
     }
     return {
       changeBoard,
@@ -126,6 +130,7 @@ export default defineComponent({
       changePage,
       topicsData,
       board,
+      currentPage,
     }
   },
 })

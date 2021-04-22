@@ -101,7 +101,6 @@ export const store = createStore<GlobalDataProps>({
       state.topicsData[key] = { ...rawData }
     },
     fetchBoards(state, rawData) {
-      // const { board } = rawData
       state.board = { ...rawData }
     },
     fetchTopicsByBoard(state, rawData) {
@@ -132,7 +131,9 @@ export const store = createStore<GlobalDataProps>({
       return asyncAndCommit(url.topic, 'fetchTopics', commit, params)
     },
     fetchBoards({ state, commit }) {
-      return asyncAndCommit(url.board, 'fetchBoards', commit)
+      if (state.board.length == 0) {
+        return asyncAndCommit(url.board, 'fetchBoards', commit)
+      }
     },
     fetchTopicsByBoard({ state, commit }, params) {
       const key = 'board' + params.id + 'page' + params.params.page

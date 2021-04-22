@@ -1,5 +1,5 @@
 <template>
-  <div class="TopicContainer">
+  <div class="TopicContainer" v-if="topicsData !== undefined">
     <div class="topics">
       <ul class="board">
         <li>
@@ -18,7 +18,7 @@
         </li>
       </ul>
       <ul class="topicList">
-        <li class="topic" v-for="topic in topicsData.topics" :key="topic.id">
+        <li v-for="topic in JSON.parse(topicsData.items)" :key="topic.id">
           <div>
             <a class="user_avatar">
               <img :src="getImgUrl(topic.user_id)" alt="" />
@@ -46,7 +46,7 @@
       <el-pagination
         background
         layout="prev, pager, next"
-        :page-count="topicsData.pageCount"
+        :page-count="topicsData.pages"
         :current-page="Number(currentPage.page)"
         @current-change="changePage"
       >
@@ -67,33 +67,29 @@
 
 <script>
 import { url } from '../../../api'
-import axios from 'axios'
 import { defineComponent, onBeforeMount, ref, computed } from 'vue'
 import { formatDate } from '../../libs/libs'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { useStore } from 'vuex'
-
-if (localStorage.getItem('token') !== '') {
-  axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
-}
 
 export default defineComponent({
   name: 'Topic',
   setup() {
     const store = useStore()
     const router = useRouter()
-    const currentBoardId = ref(0)
-    const topicsData = computed(() => store.state.topicsData)
-    const board = computed(() => store.state.board)
-    const currentPage = ref(router.currentRoute.value.query || { page: 1 })
+    const currentBoardId = ref(
+      Number(router.currentRoute.value.query.board) || 0,
+    )
+    const currentPage = ref(router.currentRoute.value.query.page || 1)
 
-    onBeforeMount(() => {
-      store.dispatch('fetchTopics', {
-        params: currentPage.value,
-      })
-      store.dispatch('fetchBoards')
-    })
+    const board = computed(() => store.state.board)
+    const topicsData = computed(
+      () =>
+        store.getters.getTopicsbyIdPage(
+          currentBoardId.value,
+          currentPage.value,
+        ) || undefined,
+    )
 
     const getImgUrl = userid => {
       return url.host + '/' + 'static/head/' + (userid % 10) + '.png'
@@ -102,13 +98,16 @@ export default defineComponent({
       const payload = {
         id: id,
         params: {
-          params: {
-            page: 1,
-          },
+          page: 1,
         },
       }
       currentBoardId.value = id
-      store.dispatch('fetchTopicsByBoard', payload)
+      store.dispatch('fetchTopicsByBoard', payload).then(() => {
+        router.push({
+          query: { board: currentBoardId.value, page: 1 },
+        })
+        currentPage.value = 1
+      })
     }
     const changePage = page => {
       const payload = {
@@ -119,10 +118,16 @@ export default defineComponent({
       }
       store.dispatch('fetchTopicsByBoard', payload).then(() => {
         router.push({
-          query: { page: page },
+          query: { board: currentBoardId.value, page: page },
         })
+        currentPage.value = page
       })
     }
+    onBeforeMount(() => {
+      changePage(currentPage.value)
+      store.dispatch('fetchBoards')
+    })
+
     return {
       changeBoard,
       getImgUrl,
@@ -131,6 +136,7 @@ export default defineComponent({
       topicsData,
       board,
       currentPage,
+      currentBoardId,
     }
   },
 })
@@ -161,22 +167,20 @@ img {
   .topicList {
     li {
       display: flex;
-      //padding: 9px;
       font-size: 15px;
       font-weight: 400;
       background-color: white;
-      //color: #333;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .topic {
-      //margin-top: 20px;
-      padding: 6px 10px 6px;
-      display: flex;
       justify-content: space-between;
-      align-items: center;
+      padding: 2px 20px;
+      border-bottom: 1px solid #f0f0f0;
       div {
         display: flex;
         align-items: center;
+        a {
+          color: #4d5d70;
+          font-size: 16px;
+          font-weight: 600;
+        }
         .user_avatar {
           img {
             width: 46px;
@@ -196,7 +200,20 @@ img {
       .views {
         font-size: 10px;
         padding-right: 10px;
+        display: flex;
+        align-items: center;
       }
+    }
+  }
+  .topic {
+    //margin-top: 20px;
+    padding: 6px 10px 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    div {
+      display: flex;
+      align-items: center;
     }
   }
   .toobar {

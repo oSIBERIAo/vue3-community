@@ -1,6 +1,7 @@
 import { createStore, Commit } from 'vuex'
 import axios, { AxiosRequestConfig } from 'axios'
 import { url } from '../../api'
+import { arrToObj } from '../libs/libs'
 
 export interface ImageProps {
   _id?: string
@@ -22,13 +23,30 @@ export interface UserProps {
   user_username?: any
 }
 
+export interface TopicsData {
+  [id: string]: {
+    [page: string]: {
+      topics?: {}
+      pageCount?: number
+    }
+  }
+}
 export interface GlobalDataProps {
   token: string
   user: UserProps
-  topicsData: {
-    topics?: {}
-    pageCount?: number
-  }
+  // topicsData: {
+  //   topics?: {}
+  //   pageCount?: number
+  // }
+  // topicsData: {
+  //   [id: string]: {
+  //     [page: string]: {
+  //       topics?: {}
+  //       pageCount?: number
+  //     }
+  //   }
+  // }
+  topicsData: any
   board: object[]
 }
 
@@ -78,22 +96,18 @@ export const store = createStore<GlobalDataProps>({
       state.user = { isLogin: true, ...rawData }
     },
     fetchTopics(state, rawData) {
-      const { items, pages } = rawData
-      state.topicsData = {
-        topics: JSON.parse(items),
-        pageCount: pages,
-      }
+      const { items, page, pages, board } = rawData
+      const key = 'board' + board + 'page' + page
+      state.topicsData[key] = { ...rawData }
     },
     fetchBoards(state, rawData) {
       // const { board } = rawData
       state.board = { ...rawData }
     },
     fetchTopicsByBoard(state, rawData) {
-      const { items, pages } = rawData
-      state.topicsData = {
-        topics: JSON.parse(items),
-        pageCount: pages,
-      }
+      const { items, page, pages, board } = rawData
+      const key = 'board' + board + 'page' + page
+      state.topicsData[key] = { ...rawData }
     },
   },
   actions: {
@@ -120,13 +134,22 @@ export const store = createStore<GlobalDataProps>({
     fetchBoards({ state, commit }) {
       return asyncAndCommit(url.board, 'fetchBoards', commit)
     },
-    fetchTopicsByBoard({ commit }, params) {
-      return asyncAndCommit(
-        url.board + '/' + params.id,
-        'fetchTopicsByBoard',
-        commit,
-        params,
-      )
+    fetchTopicsByBoard({ state, commit }, params) {
+      const key = 'board' + params.id + 'page' + params.params.page
+      if (!state.topicsData[key]) {
+        return asyncAndCommit(
+          url.board + '/' + params.id,
+          'fetchTopicsByBoard',
+          commit,
+          params,
+        )
+      }
+    },
+  },
+  getters: {
+    getTopicsbyIdPage: state => (id: any, page: any) => {
+      const key = 'board' + id + 'page' + page
+      return state.topicsData[key]
     },
   },
   modules: {},

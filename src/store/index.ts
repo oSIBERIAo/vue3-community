@@ -1,7 +1,6 @@
 import { createStore, Commit } from 'vuex'
 import axios, { AxiosRequestConfig } from 'axios'
 import { url } from '../../api'
-import { arrToObj } from '../libs/libs'
 
 export interface ImageProps {
   _id?: string
@@ -19,35 +18,27 @@ export interface UserProps {
   avatar?: ImageProps
   description?: string
   username?: string
-  user_id?: any
-  user_username?: any
+  user_id?: string
+  user_username?: string
 }
 
 export interface TopicsData {
-  [id: string]: {
-    [page: string]: {
-      topics?: {}
-      pageCount?: number
-    }
-  }
+  items?: string
+  pages: number
+  page: number
+  board: number
+  per_page: number
 }
 export interface GlobalDataProps {
   token: string
   user: UserProps
-  // topicsData: {
-  //   topics?: {}
-  //   pageCount?: number
-  // }
-  // topicsData: {
-  //   [id: string]: {
-  //     [page: string]: {
-  //       topics?: {}
-  //       pageCount?: number
-  //     }
-  //   }
-  // }
-  topicsData: any
+  topicsData: {
+    [key: string]: TopicsData
+  }
   board: object[]
+  topic: {
+    [key: string]: any
+  }
 }
 
 const asyncAndCommit = async (
@@ -72,6 +63,7 @@ export const store = createStore<GlobalDataProps>({
     user: { isLogin: false },
     topicsData: {},
     board: [],
+    topic: {},
   },
   mutations: {
     login(state, rawData) {
@@ -83,8 +75,6 @@ export const store = createStore<GlobalDataProps>({
         'Basic ' + btoa(rawData.token + ':')
       localStorage.setItem('token', 'Basic ' + btoa(rawData.token + ':'))
       // TODO 改服务器token
-      // localStorage.setItem('user_id', rawData.user_id)
-      // localStorage.setItem('user_username', rawData.user_username)
     },
     logout(state) {
       state.token = ''
@@ -96,17 +86,28 @@ export const store = createStore<GlobalDataProps>({
       state.user = { isLogin: true, ...rawData }
     },
     fetchTopics(state, rawData) {
-      const { items, page, pages, board } = rawData
+      const { page, board } = rawData
       const key = 'board' + board + 'page' + page
       state.topicsData[key] = { ...rawData }
+    },
+    fetchTopicById(state, rawData) {
+      const { id } = rawData
+      state.topic[id] = { ...rawData }
+      console.log('state.topic[id] ', state.topic[id])
     },
     fetchBoards(state, rawData) {
       state.board = { ...rawData }
     },
     fetchTopicsByBoard(state, rawData) {
-      const { items, page, pages, board } = rawData
+      const { page, board } = rawData
       const key = 'board' + board + 'page' + page
       state.topicsData[key] = { ...rawData }
+    },
+    submitTopicReply(state, rawData) {
+      const id = rawData.topic_id
+      const replies = JSON.parse(state.topic[id].replies)
+      replies.push(rawData)
+      state.topic[id].replies = JSON.stringify(replies)
     },
   },
   actions: {
@@ -130,6 +131,16 @@ export const store = createStore<GlobalDataProps>({
     fetchTopics({ state, commit }, params) {
       return asyncAndCommit(url.topic, 'fetchTopics', commit, params)
     },
+    fetchTopicById({ state, commit }, payload) {
+      const id = payload
+      if (!state.topic[id]) {
+        return asyncAndCommit(
+          url.topic + '/' + payload,
+          'fetchTopicById',
+          commit,
+        )
+      }
+    },
     fetchBoards({ state, commit }) {
       if (state.board.length == 0) {
         return asyncAndCommit(url.board, 'fetchBoards', commit)
@@ -146,11 +157,18 @@ export const store = createStore<GlobalDataProps>({
         )
       }
     },
+    submitTopicReply({ commit }, params) {
+      params = { method: 'post', data: params }
+      return asyncAndCommit(url.topic_reply, 'submitTopicReply', commit, params)
+    },
   },
   getters: {
-    getTopicsbyIdPage: state => (id: any, page: any) => {
+    getTopicsbyIdPage: state => (id: number, page: number) => {
       const key = 'board' + id + 'page' + page
       return state.topicsData[key]
+    },
+    getTopicbyId: state => (id: number) => {
+      return state.topic[id]
     },
   },
   modules: {},

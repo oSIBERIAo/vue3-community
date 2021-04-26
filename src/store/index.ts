@@ -102,12 +102,19 @@ export const store = createStore<GlobalDataProps>({
       const { page, board } = rawData
       const key = 'board' + board + 'page' + page
       state.topicsData[key] = { ...rawData }
+      console.log('state ', state)
     },
     submitTopicReply(state, rawData) {
       const id = rawData.topic_id
       const replies = JSON.parse(state.topic[id].replies)
       replies.push(rawData)
       state.topic[id].replies = JSON.stringify(replies)
+    },
+    deleteTopicById(state, rawData) {
+      const { extraData } = rawData
+      console.log('deleteTopicById-extraData', extraData.data.get('topic_id'))
+      const id = extraData.data.get('topic_id')
+      delete state.topic[id]
     },
   },
   actions: {
@@ -160,6 +167,17 @@ export const store = createStore<GlobalDataProps>({
     submitTopicReply({ commit }, params) {
       params = { method: 'post', data: params }
       return asyncAndCommit(url.topic_reply, 'submitTopicReply', commit, params)
+    },
+    deleteTopicById({ state, commit }, params) {
+      params = { method: 'post', data: params }
+      state.topicsData = {}
+      return asyncAndCommit(
+        url.topic_delete,
+        'deleteTopicById',
+        commit,
+        params,
+        params,
+      )
     },
   },
   getters: {

@@ -107,16 +107,10 @@ export default defineComponent({
     const onDelete = () => {
       const params = new URLSearchParams()
       params.append('topic_id', String(route.query.id))
-      axios
-        .post(url.topic_delete, params)
-        .then(response => {
-          console.log(response)
-          // data.replies.push(response.data)
-          router.push('/')
-        })
-        .catch(function(err) {
-          console.log(err)
-        })
+
+      store.dispatch('deleteTopicById', params).then(() => {
+        router.push('/')
+      })
     }
     const onEditor = () => {
       router.push('/topic/new?id=' + route.query.id)

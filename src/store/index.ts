@@ -103,6 +103,10 @@ export const store = createStore<GlobalDataProps>({
       const key = 'board' + board + 'page' + page
       state.topicsData[key] = { ...rawData }
       console.log('state ', state)
+      state.topicsData[board] = {
+        ...state.topicsData[board],
+        [page]: { ...rawData },
+      }
     },
     submitTopicReply(state, rawData) {
       const id = rawData.topic_id
@@ -112,9 +116,21 @@ export const store = createStore<GlobalDataProps>({
     },
     deleteTopicById(state, rawData) {
       const { extraData } = rawData
-      console.log('deleteTopicById-extraData', extraData.data.get('topic_id'))
+      // console.log('deleteTopicById-extraData', extraData.data.get('topic_id'))
       const id = extraData.data.get('topic_id')
       delete state.topic[id]
+    },
+    updateTopic(state, rawData) {
+      const { extraData } = rawData
+      // console.log('deleteTopicById-extraData', extraData.data.get('topic_id'))
+      const id = extraData.data.get('topic_id')
+      delete state.topic[id]
+    },
+    addTopic(state, rawData) {
+      console.log('rawDatarawData---addTopic', rawData)
+      const { id } = rawData
+      state.topic[id] = { ...rawData }
+      state.topicsData = {}
     },
   },
   actions: {
@@ -179,6 +195,22 @@ export const store = createStore<GlobalDataProps>({
         params,
       )
     },
+    updateTopic({ commit }, params) {
+      params = { method: 'post', data: params }
+      console.log('updateTopic!')
+      return asyncAndCommit(
+        url.topic_update,
+        'updateTopic',
+        commit,
+        params,
+        params,
+      )
+    },
+    addTopic({ dispatch, commit }, params) {
+      params = { method: 'post', data: params }
+      console.log('updateTopic!')
+      return asyncAndCommit(url.topic_add, 'addTopic', commit, params, params)
+    },
   },
   getters: {
     getTopicsbyIdPage: state => (id: number, page: number) => {
@@ -187,6 +219,9 @@ export const store = createStore<GlobalDataProps>({
     },
     getTopicbyId: state => (id: number) => {
       return state.topic[id]
+    },
+    getBoards: state => {
+      return state.board
     },
   },
   modules: {},

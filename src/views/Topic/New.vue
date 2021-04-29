@@ -12,12 +12,19 @@
     </div>
     <div class="board">
       <span>板块：</span>
-      <el-select v-model="data.boardId" placeholder="请选择">
+
+      <el-select v-model="data.boardId" clearable placeholder="请选择">
+        <!--        <el-option-->
+        <!--          v-for="item in data.options"-->
+        <!--          :key="item.value"-->
+        <!--          :label="item.label"-->
+        <!--          :value="item.value"-->
+        <!--        ></el-option>-->
         <el-option
-          v-for="item in data.options"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
+          v-for="item in board"
+          :key="item.id"
+          :label="item.content"
+          :value="item.id"
         ></el-option>
       </el-select>
     </div>
@@ -29,19 +36,27 @@
       ></v-md-editor>
     </div>
     <div class="onSubmit">
-      <el-button type="primary" @click="onSubmit">立即创建</el-button>
+      <el-button v-if="!route.query.id" type="primary" @click="onSubmit"
+        >立即创建</el-button
+      >
+      <el-button v-else type="primary" @click="onUpdate">更新保存</el-button>
     </div>
+
+    {{ data }}
     <!--    {{ data.title }}: {{ data.content }}-->
+    <!--    {{ board }}-->
   </div>
 </template>
 <script lang="ts">
 // import pagination from './Pagination'
 import { url } from '../../../api'
 import axios from 'axios'
-import { defineComponent, onBeforeMount, reactive, computed } from 'vue'
+import { computed, defineComponent, onBeforeMount, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { formatDate } from '../../libs/libs'
 import { ElMessage } from 'element-plus'
+import { useStore } from 'vuex'
+import router from '../../router'
 
 if (localStorage.getItem('token') !== '') {
   axios.defaults.headers.common['Authorization'] = localStorage.getItem('token')
@@ -51,11 +66,25 @@ export default defineComponent({
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const store = useStore()
+
+    const board = computed(() => {
+      const b = store.getters.getBoards
+      const a = [{ id: -1, content: '全部' }]
+      for (const i in b) {
+        a.push(b[i])
+      }
+      return a || undefined
+    })
+    const topic = computed(
+      () => store.getters.getTopicbyId(route.query.id) || undefined,
+    )
+
     type Data = {
       title: string
       content: string
       data: null
-      board: null
+      board: any
       options: never[]
       boardId: string
       isLoading: boolean
@@ -65,81 +94,40 @@ export default defineComponent({
       title: '',
       content: '',
       data: null,
-      board: null,
+      board: board,
       options: [],
       boardId: '',
       isLoading: false,
       input: '# hello',
     })
-    const getDate = () => {
-      axios
-        .get(url.board)
-        .then(response => {
-          data.board = response.data
-          console.log('response.data', response.data)
-          const options: any = []
-          response.data.forEach((e: { id: any; content: any }) => {
-            const o: any = {}
-            o.value = e.id
-            o.label = e.content
-            options.push(o)
-          })
-          data.options = options
-          console.log('data-----', data)
-        })
-        .catch(function(err) {
-          console.log(err)
-        })
-    }
-    const getEditorTopic = () => {
-      axios
-        .get(url.topic + '/' + route.query.id)
-        .then(response => {
-          data.title = response.data.title
-          data.boardId = response.data.board_id
-          data.content = response.data.content
-          console.log('getEditorTopic', response)
-        })
-        .catch(function(err) {
-          console.log(err)
-        })
-    }
     const onSubmit = () => {
       console.log('submit!')
       const params = new URLSearchParams()
       params.append('title', data.title)
       params.append('content', data.content)
       params.append('boardId', data.boardId)
-      axios
-        .post(url.topic_add, params)
-        .then(response => {
-          data.isLoading = false
-          console.log(response)
-          data.data = response.data
-          router.push(`/topic/detail?id=${response.data.id}`)
+
+      store
+        .dispatch('addTopic', params)
+        .then(res => {
+          console.log('res', res)
+          router.push('/topic/detail?id=' + res.id)
         })
         .catch(function(err) {
           console.log(err)
         })
     }
     const onUpdate = () => {
-      console.log('submit!')
       const params = new URLSearchParams()
       params.append('title', data.title)
       params.append('content', data.content)
       params.append('board_id', data.boardId)
       params.append('topic_id', String(route.query.id))
-      axios
-        .post(url.topic_update, params)
-        .then(response => {
-          data.isLoading = false
-          console.log(response)
-          data.data = response.data
-          // router.push(`/topic/detail?id=${response.data.id}`)
-          ElMessage.success({
-            message: '保存成功',
-            type: 'success',
-          })
+
+      store
+        .dispatch('updateTopic', params)
+        .then(() => {
+          router.push('/topic/detail?id=' + route.query.id)
         })
         .catch(function(err) {
           console.log(err)
@@ -147,18 +135,22 @@ export default defineComponent({
     }
     onBeforeMount(() => {
       console.log('onBeforeMount')
-      getDate()
-      if (route.query.id) {
-        console.log('route.query.id', route.query.id)
-        getEditorTopic()
-      }
+      store.dispatch('fetchBoards')
+      store.dispatch('fetchTopicById', route.query.id).then(() => {
+        const { board_id, content, title } = topic.value
+        data.content = content
+        data.boardId = board_id
+        data.title = title
+      })
     })
     return {
       data,
-      getDate,
       onSubmit,
       onUpdate,
       formatDate,
+      board,
+      topic,
+      route,
     }
   },
 })

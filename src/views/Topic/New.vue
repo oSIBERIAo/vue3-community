@@ -14,12 +14,6 @@
       <span>板块：</span>
 
       <el-select v-model="data.boardId" clearable placeholder="请选择">
-        <!--        <el-option-->
-        <!--          v-for="item in data.options"-->
-        <!--          :key="item.value"-->
-        <!--          :label="item.label"-->
-        <!--          :value="item.value"-->
-        <!--        ></el-option>-->
         <el-option
           v-for="item in board"
           :key="item.id"
@@ -48,8 +42,6 @@
   </div>
 </template>
 <script lang="ts">
-// import pagination from './Pagination'
-import { url } from '../../../api'
 import axios from 'axios'
 import { computed, defineComponent, onBeforeMount, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

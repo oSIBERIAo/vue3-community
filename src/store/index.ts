@@ -87,8 +87,10 @@ export const store = createStore<GlobalDataProps>({
     },
     fetchTopics(state, rawData) {
       const { page, board } = rawData
-      const key = 'board' + board + 'page' + page
-      state.topicsData[key] = { ...rawData }
+      state.topicsData[board] = {
+        ...state.topicsData[board],
+        [page]: { ...rawData },
+      }
     },
     fetchTopicById(state, rawData) {
       const { id } = rawData
@@ -100,9 +102,6 @@ export const store = createStore<GlobalDataProps>({
     },
     fetchTopicsByBoard(state, rawData) {
       const { page, board } = rawData
-      const key = 'board' + board + 'page' + page
-      state.topicsData[key] = { ...rawData }
-      console.log('state ', state)
       state.topicsData[board] = {
         ...state.topicsData[board],
         [page]: { ...rawData },
@@ -116,13 +115,11 @@ export const store = createStore<GlobalDataProps>({
     },
     deleteTopicById(state, rawData) {
       const { extraData } = rawData
-      // console.log('deleteTopicById-extraData', extraData.data.get('topic_id'))
       const id = extraData.data.get('topic_id')
       delete state.topic[id]
     },
     updateTopic(state, rawData) {
       const { extraData } = rawData
-      // console.log('deleteTopicById-extraData', extraData.data.get('topic_id'))
       const id = extraData.data.get('topic_id')
       delete state.topic[id]
     },
@@ -170,15 +167,19 @@ export const store = createStore<GlobalDataProps>({
       }
     },
     fetchTopicsByBoard({ state, commit }, params) {
-      const key = 'board' + params.id + 'page' + params.params.page
-      if (!state.topicsData[key]) {
-        return asyncAndCommit(
-          url.board + '/' + params.id,
-          'fetchTopicsByBoard',
-          commit,
-          params,
-        )
+      const board = params.id
+      const page = params.params.page
+      console.log('state.topicsData', state.topicsData[board])
+      if (!state.topicsData[board]) {
+        console.log('state.topicsData[board]', state.topicsData[board])
+        console.log('state.topicsData', state.topicsData[1])
       }
+      return asyncAndCommit(
+        url.board + '/' + params.id,
+        'fetchTopicsByBoard',
+        commit,
+        params,
+      )
     },
     submitTopicReply({ commit }, params) {
       params = { method: 'post', data: params }
@@ -206,17 +207,13 @@ export const store = createStore<GlobalDataProps>({
         params,
       )
     },
-    addTopic({ dispatch, commit }, params) {
+    addTopic({ commit }, params) {
       params = { method: 'post', data: params }
       console.log('updateTopic!')
       return asyncAndCommit(url.topic_add, 'addTopic', commit, params, params)
     },
   },
   getters: {
-    getTopicsbyIdPage: state => (id: number, page: number) => {
-      const key = 'board' + id + 'page' + page
-      return state.topicsData[key]
-    },
     getTopicbyId: state => (id: number) => {
       return state.topic[id]
     },

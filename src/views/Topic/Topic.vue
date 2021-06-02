@@ -1,5 +1,5 @@
 <template>
-  <div class="TopicContainer" v-if="topicsData !== undefined">
+  <div class="TopicContainer" v-if="data.topic !== null">
     <div class="topics">
       <ul class="board">
         <li>
@@ -18,7 +18,7 @@
         </li>
       </ul>
       <ul class="topicList">
-        <li v-for="topic in JSON.parse(topicsData.items)" :key="topic.id">
+        <li v-for="topic in JSON.parse(data.topic.items)" :key="topic.id">
           <div>
             <a class="user_avatar">
               <img :src="getImgUrl(topic.user_id)" alt="" />
@@ -46,8 +46,8 @@
       <el-pagination
         background
         layout="prev, pager, next"
-        :page-count="topicsData.pages"
-        :current-page="Number(currentPage.page)"
+        :page-count="data.topic.pages"
+        :current-page="Number(data.topic.page)"
         @current-change="changePage"
       >
       </el-pagination>
@@ -67,7 +67,7 @@
 
 <script>
 import { url } from '../../../api'
-import { defineComponent, onBeforeMount, ref, computed } from 'vue'
+import { defineComponent, onBeforeMount, ref, computed, reactive } from 'vue'
 import { formatDate } from '../../libs/libs'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
@@ -82,14 +82,10 @@ export default defineComponent({
     )
     const currentPage = ref(router.currentRoute.value.query.page || 1)
 
+    const data = reactive({
+      topic: null,
+    })
     const board = computed(() => store.state.board)
-    const topicsData = computed(
-      () =>
-        store.getters.getTopicsbyIdPage(
-          currentBoardId.value,
-          currentPage.value,
-        ) || undefined,
-    )
 
     const getImgUrl = userid => {
       return url.host + '/' + 'static/head/' + (userid % 10) + '.png'
@@ -103,6 +99,7 @@ export default defineComponent({
       }
       currentBoardId.value = id
       store.dispatch('fetchTopicsByBoard', payload).then(() => {
+        data.topic = store.state.topicsData[currentBoardId.value][1]
         router.push({
           query: { board: currentBoardId.value, page: 1 },
         })
@@ -117,6 +114,7 @@ export default defineComponent({
         },
       }
       store.dispatch('fetchTopicsByBoard', payload).then(() => {
+        data.topic = store.state.topicsData[currentBoardId.value][page]
         router.push({
           query: { board: currentBoardId.value, page: page },
         })
@@ -133,10 +131,10 @@ export default defineComponent({
       getImgUrl,
       formatDate,
       changePage,
-      topicsData,
       board,
       currentPage,
       currentBoardId,
+      data,
     }
   },
 })

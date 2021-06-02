@@ -26,8 +26,12 @@ const url: Url = {
   addimg: '/v1/index/addimg',
   xxx: '/v1/index/xxx',
 }
-
-const host = 'http://127.0.0.1:5000'
+let host
+if (import.meta.env.DEV) {
+  host = 'http://127.0.0.1:5000'
+} else {
+  host = 'http://xi9li.com'
+}
 
 for (const key in url) {
   if (url.hasOwnProperty(key)) {

@@ -88,7 +88,7 @@ export default defineComponent({
     const board = computed(() => store.state.board)
 
     const getImgUrl = userid => {
-      return url.host + '/' + 'static/head/' + (userid % 10) + '.png'
+      return url.host + '/' + 'head/' + (userid % 10) + '.png'
     }
     const changeBoard = id => {
       const payload = {

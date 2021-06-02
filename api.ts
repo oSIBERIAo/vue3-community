@@ -27,12 +27,7 @@ const url: Url = {
   xxx: '/v1/index/xxx',
 }
 
-let host: string
-if (import.meta.env.PROD) {
-  host = 'http://xi9li.com'
-} else {
-  host = 'http://127.0.0.1:5000'
-}
+const host = 'http://127.0.0.1:5000'
 
 for (const key in url) {
   if (url.hasOwnProperty(key)) {

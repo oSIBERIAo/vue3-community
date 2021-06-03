@@ -57,7 +57,7 @@ export default defineComponent({
       getProfileDate()
     })
     const action = computed(() => {
-      return 'http://127.0.0.1:5000/v1/index/addimg'
+      return url.addimg
     })
     const headers = computed(() => {
       return { Authorization: localStorage.getItem('token') }

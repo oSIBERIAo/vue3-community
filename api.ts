@@ -30,7 +30,7 @@ let host
 if (import.meta.env.DEV) {
   host = 'http://127.0.0.1:5000'
 } else {
-  host = 'http://xi9li.com'
+  host = 'https://xi9li.com'
 }
 
 for (const key in url) {

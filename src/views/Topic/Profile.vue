@@ -50,7 +50,7 @@ export default defineComponent({
     const getProfileDate = () => {
       data.token = user.value.token
       data.user = user.value.username
-      data.imageUrl = url.host + '/' + 'static/img/' + user.value.user_image
+      data.imageUrl = url.host + '/' + 'img/' + user.value.user_image
     }
     onBeforeMount(() => {
       console.log('onBeforeMount')

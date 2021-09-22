@@ -87,7 +87,7 @@ export default defineComponent({
     console.log('topic', topic)
     console.log('judgeAuthor', judgeAuthor)
     const getImgUrl = (userid: number) => {
-      return url.host + '/' + 'static/head/' + (userid % 10) + '.png'
+      return url.host + '/' + 'head/' + (userid % 10) + '.png'
     }
     const onSubmit = () => {
       const params = new FormData()

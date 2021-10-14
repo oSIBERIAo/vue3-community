@@ -1,7 +1,8 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <br />
+    <HelloWorld msg="这是一个基于 Vue.js + TypeScript 搭建的论坛" />
   </div>
 </template>
 
@@ -16,3 +17,10 @@ export default defineComponent({
   },
 })
 </script>
+<style scoped lang="scss">
+.home {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+</style>

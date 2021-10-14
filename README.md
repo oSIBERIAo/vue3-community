@@ -1,27 +1,13 @@
-# Vue 3 + Typescript + Vite
+# Community 论坛
 
-This template should help get you started developing with Vue 3 and Typescript in Vite.
+[网站导航](https://xi9li.com/)
 
-## Recommended IDE Setup
+一款基于 Vue 3 + Typescript + Vite 的论坛前端实现。
 
-[VSCode](https://code.visualstudio.com/) + [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur). Make sure to enable `vetur.experimental.templateInterpolationService` in settings!
+## 项目特点
 
-### If Using `<script setup>`
-
-[`<script setup>`](https://github.com/vuejs/rfcs/pull/227) is a feature that is currently in RFC stage. To get proper IDE support for the syntax, use [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) instead of Vetur (and disable Vetur).
-
-## Type Support For `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can use the following:
-
-### If Using Volar
-
-Run `Volar: Switch TS Plugin on/off` from VSCode command palette.
-
-### If Using Vetur
-
-1. Install and add `@vuedx/typescript-plugin-vue` to the [plugins section](https://www.typescriptlang.org/tsconfig#plugins) in `tsconfig.json`
-2. Delete `src/shims-vue.d.ts` as it is no longer needed to provide module info to Typescript
-3. Open `src/main.ts` in VSCode
-4. Open the VSCode command palette
-5. Search and run "Select TypeScript version" -> "Use workspace version"
+1. 使用了 **Vue 3** / **TypeScript** / **Vite** / **Vuex** / **Axios** 
+2. 使用 **Axios** 封装好请求，并配置好请求拦截器。
+3. **vue-router** 的跳转等运用，**Vuex** 等对数据进行管理
+4. 前后端分离，**RESTful API**， 包括 **AJAX**, **Https**， **CORS** 跨域，**Token** 认证 等的运用。后端使用基于 Python 的 **Flask**, **Nginx**。
+5. Vue3 前端实现交流论坛，博客发布，支持 Markdown，留言评论，注册登录等.

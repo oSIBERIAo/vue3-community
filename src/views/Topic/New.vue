@@ -36,7 +36,7 @@
       <el-button v-else type="primary" @click="onUpdate">更新保存</el-button>
     </div>
 
-    {{ data }}
+    <!--    {{ data }}-->
     <!--    {{ data.title }}: {{ data.content }}-->
     <!--    {{ board }}-->
   </div>

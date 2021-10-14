@@ -6,10 +6,7 @@
       <!--        <a href="#"><router-link to="/about">About</router-link></a>-->
       <!--      </li>-->
       <li>
-        <a href="#"><router-link to="/vue">Home</router-link></a>
-      </li>
-      <li>
-        <a href="#"><router-link to="/topic">Topic</router-link></a>
+        <a href="#"><router-link to="/topic">首页</router-link></a>
       </li>
       <!--      <li><a href="#">API</a></li>-->
       <!--      <li><a href="#">关于</a></li>-->
@@ -21,6 +18,9 @@
       </li>
       <li>
         <a href="#"><router-link to="/signin">登陆</router-link></a>
+      </li>
+      <li>
+        <a href="#"><router-link to="/vue">介绍</router-link></a>
       </li>
     </ul>
   </div>

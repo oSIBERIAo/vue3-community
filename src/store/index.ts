@@ -129,6 +129,10 @@ export const store = createStore<GlobalDataProps>({
       state.topic[id] = { ...rawData }
       state.topicsData = {}
     },
+    // addBoard(state, rawData) {
+    //   console.log('rawDatarawData---addBoard', rawData)
+    //   console.log('addBoard', rawData)
+    // },
   },
   actions: {
     login({ commit }, payload) {
@@ -211,6 +215,11 @@ export const store = createStore<GlobalDataProps>({
       params = { method: 'post', data: params }
       console.log('updateTopic!')
       return asyncAndCommit(url.topic_add, 'addTopic', commit, params, params)
+    },
+    addBoard({ commit }, params) {
+      params = { method: 'post', data: params }
+      console.log('addBoard!')
+      return asyncAndCommit(url.board_add, 'addBoard', commit, params, params)
     },
   },
   getters: {

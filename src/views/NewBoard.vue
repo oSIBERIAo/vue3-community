@@ -26,14 +26,15 @@
 import { defineComponent, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-//eslint-disable-next-line
 import axios from 'axios'
-//eslint-disable-next-line
 import { url } from '../../api.ts'
 import { useStore } from 'vuex'
 
+console.log('url', url.register)
+console.log('axios', axios)
+
 export default defineComponent({
-  name: 'Signup',
+  name: 'Newboard',
   setup() {
     const store = useStore()
     const router = useRouter()

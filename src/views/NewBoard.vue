@@ -27,7 +27,7 @@ import { defineComponent, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
-import { url } from '../../api.ts'
+import { url } from '../../api'
 import { useStore } from 'vuex'
 
 console.log('url', url.register)

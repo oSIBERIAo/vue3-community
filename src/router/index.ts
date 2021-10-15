@@ -41,7 +41,8 @@ const AdminRouter: Array<RouteRecordRaw> = [
     //   import(/* webpackChunkName: "about" */ '../views/About.vue'),
     components: {
       header: Header,
-      main: import(/* webpackChunkName: "about" */ '../views/NewBoard.vue'),
+      // main: import(/* webpackChunkName: "about" */ '../views/NewBoard.vue'),
+      main: () => import('../views/NewBoard.vue'),
     },
   },
   {
